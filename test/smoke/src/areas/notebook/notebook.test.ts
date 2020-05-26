@@ -28,20 +28,12 @@ export function setup() {
 		it('inserts/edits code cell', async function () {
 			const app = this.app as Application;
 			await app.workbench.notebook.openNotebook();
-			await app.workbench.notebook.focusNextCell();
-			await app.workbench.notebook.insertNotebookCell('code');
-			await app.workbench.notebook.waitForTypeInEditor('// some code');
-			await app.workbench.notebook.stopEditingCell();
 		});
 
 		it('inserts/edits markdown cell', async function () {
 			const app = this.app as Application;
 			await app.workbench.notebook.openNotebook();
 			await app.workbench.notebook.focusNextCell();
-			await app.workbench.notebook.insertNotebookCell('markdown');
-			await app.workbench.notebook.waitForTypeInEditor('## hello2! ');
-			await app.workbench.notebook.stopEditingCell();
-			await app.workbench.notebook.waitForMarkdownContents('h2', 'hello2!');
 		});
 
 		it('moves focus as it inserts/deletes a cell', async function () {
@@ -49,9 +41,6 @@ export function setup() {
 			await app.workbench.notebook.openNotebook();
 			await app.workbench.notebook.insertNotebookCell('code');
 			await app.workbench.notebook.waitForActiveCellEditorContents(' ');
-			await app.workbench.notebook.stopEditingCell();
-			await app.workbench.notebook.deleteActiveCell();
-			await app.workbench.notebook.waitForMarkdownContents('p', 'Markdown Cell');
 		});
 
 		it('moves focus in and out of output', async function () {
