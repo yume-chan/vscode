@@ -5,11 +5,10 @@
 
 import * as cp from 'child_process';
 import { Application } from '../../../../automation';
-import { describeRepeat } from '../../utils';
 
-function wait(ms: number): Promise<void> {
-	return new Promise(r => setTimeout(r, ms));
-}
+// function wait(ms: number): Promise<void> {
+// 	return new Promise(r => setTimeout(r, ms));
+// }
 
 
 export function setup() {
