@@ -120,6 +120,8 @@ export async function spawn(options: SpawnOptions): Promise<Code> {
 	let child: cp.ChildProcess | undefined;
 	let connectDriver: typeof connectElectronDriver;
 
+	copyExtension(options, 'vscode-notebook-tests');
+
 	if (options.web) {
 		await launch(options.userDataDir, options.workspacePath, options.codePath);
 		connectDriver = connectPlaywrightDriver.bind(connectPlaywrightDriver, options.browser);
@@ -139,7 +141,8 @@ export async function spawn(options: SpawnOptions): Promise<Code> {
 		`--extensions-dir=${options.extensionsPath}`,
 		`--user-data-dir=${options.userDataDir}`,
 		`--disable-restore-windows`,
-		'--driver', handle
+		'--driver', handle,
+		'--enable-proposed-api=vscode.vscode-notebook-tests'
 	];
 
 	if (options.remote) {
@@ -155,9 +158,6 @@ export async function spawn(options: SpawnOptions): Promise<Code> {
 		mkdirp.sync(remoteDataDir);
 		env['TESTRESOLVER_DATA_FOLDER'] = remoteDataDir;
 	}
-
-	copyExtension(options, 'vscode-notebook-tests');
-	args.push('--enable-proposed-api=vscode.vscode-notebook-tests');
 
 	if (!codePath) {
 		args.unshift(repoPath);
