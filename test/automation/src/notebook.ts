@@ -30,7 +30,6 @@ export class Notebook {
 		await wait(1000);
 		// await this.focusFirstCell();
 		// await this.waitForActiveCellEditorContents('code()');
-		process.stdout.write('hello test\n');
 	}
 
 	async focusNextCell() {

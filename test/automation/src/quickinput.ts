@@ -36,7 +36,14 @@ export class QuickInput {
 	}
 
 	async waitForQuickInputClosed(): Promise<void> {
-		await this.code.waitForElement(QuickInput.QUICK_INPUT, r => !!r && r.attributes.style.indexOf('display: none;') !== -1);
+		await this.code.waitForElement(QuickInput.QUICK_INPUT, r => {
+			console.log(r);
+			if (r) {
+				console.log(r.attributes.style);
+			}
+
+			return !!r && r.attributes.style.indexOf('display: none;') !== -1;
+		});
 	}
 
 	async selectQuickInputElement(index: number): Promise<void> {
