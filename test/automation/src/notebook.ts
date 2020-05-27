@@ -8,6 +8,10 @@ import { QuickAccess } from './quickaccess';
 
 const activeRowSelector = `.notebook-editor .monaco-list-row.focused`;
 
+function wait(ms: number): Promise<void> {
+	return new Promise(r => setTimeout(r, ms));
+}
+
 export class Notebook {
 
 	constructor(
@@ -18,8 +22,11 @@ export class Notebook {
 	async openNotebook() {
 		await this.quickAccess.runCommand('vscode-notebook-tests.createNewNotebook');
 		await this.code.waitForElement('.notebook-editor .monaco-list-row');
+		await wait(1000);
 		// await this.focusFirstCell();
 		// await this.waitForActiveCellEditorContents('code()');
+
+		process.stdout.write('hello test\n');
 	}
 
 	async focusNextCell() {
