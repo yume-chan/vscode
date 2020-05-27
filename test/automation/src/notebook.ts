@@ -57,7 +57,7 @@ export class Notebook {
 
 	private async _waitForActiveCellEditorContents(accept: (contents: string) => boolean): Promise<any> {
 		const selector = `${activeRowSelector} .monaco-editor .view-lines`;
-		return this.code.waitForTextContent(selector, undefined, c => !!console.log(c) || accept(c.replace(/\u00a0/g, ' ')));
+		return this.code.waitForTextContent(selector, undefined, c => accept(c.replace(/\u00a0/g, ' ')));
 	}
 
 	async waitForMarkdownContents(markdownSelector: string, text: string): Promise<void> {
