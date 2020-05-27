@@ -49,12 +49,15 @@ export class QuickAccess {
 	}
 
 	async runCommand(commandId: string): Promise<void> {
+		console.log('quick access 1');
 		await this.openQuickAccess(`>${commandId}`);
 
 		// wait for best choice to be focused
+		console.log('quick access 2');
 		await this.code.waitForTextContent(QuickInput.QUICK_INPUT_FOCUSED_ELEMENT);
 
 		// wait and click on best choice
+		console.log('quick access 3');
 		await this.quickInput.selectQuickInputElement(0);
 	}
 

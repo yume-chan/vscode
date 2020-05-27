@@ -20,12 +20,16 @@ export class Notebook {
 	}
 
 	async openNotebook() {
+		console.log('open 1');
+		await wait(1000);
+		console.log('open 2');
 		await this.quickAccess.runCommand('vscode-notebook-tests.createNewNotebook');
+		console.log('open 3');
 		await this.code.waitForElement('.notebook-editor .monaco-list-row');
+		console.log('open 4');
 		await wait(1000);
 		// await this.focusFirstCell();
 		// await this.waitForActiveCellEditorContents('code()');
-
 		process.stdout.write('hello test\n');
 	}
 
