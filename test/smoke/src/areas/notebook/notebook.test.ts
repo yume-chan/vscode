@@ -5,10 +5,11 @@
 
 import * as cp from 'child_process';
 import { Application } from '../../../../automation';
+import { describeRepeat } from '../../utils';
 
-// function wait(ms: number): Promise<void> {
-// 	return new Promise(r => setTimeout(r, ms));
-// }
+function wait(ms: number): Promise<void> {
+	return new Promise(r => setTimeout(r, ms));
+}
 
 
 export function setup() {
@@ -38,9 +39,13 @@ export function setup() {
 
 		it('moves focus as it inserts/deletes a cell', async function () {
 			const app = this.app as Application;
+			console.log('1');
 			await app.workbench.notebook.openNotebook();
+			console.log('2');
 			await app.workbench.notebook.insertNotebookCell('code');
+			console.log('3');
 			await app.workbench.notebook.waitForActiveCellEditorContents(' ');
+			console.log('4');
 		});
 
 		it('moves focus in and out of output', async function () {

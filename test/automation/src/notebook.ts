@@ -17,9 +17,9 @@ export class Notebook {
 
 	async openNotebook() {
 		await this.quickAccess.runCommand('vscode-notebook-tests.createNewNotebook');
-		await this.code.waitForElement(activeRowSelector);
-		await this.focusFirstCell();
-		await this.waitForActiveCellEditorContents('code()');
+		await this.code.waitForElement('.notebook-editor .monaco-list-row');
+		// await this.focusFirstCell();
+		// await this.waitForActiveCellEditorContents('code()');
 	}
 
 	async focusNextCell() {
@@ -57,7 +57,7 @@ export class Notebook {
 
 	private async _waitForActiveCellEditorContents(accept: (contents: string) => boolean): Promise<any> {
 		const selector = `${activeRowSelector} .monaco-editor .view-lines`;
-		return this.code.waitForTextContent(selector, undefined, c => accept(c.replace(/\u00a0/g, ' ')));
+		return this.code.waitForTextContent(selector, undefined, c => !!console.log(c) || accept(c.replace(/\u00a0/g, ' ')));
 	}
 
 	async waitForMarkdownContents(markdownSelector: string, text: string): Promise<void> {
