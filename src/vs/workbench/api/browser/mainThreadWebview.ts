@@ -361,6 +361,17 @@ export class MainThreadWebviews extends Disposable implements extHostProtocol.Ma
 				}
 
 				webviewInput.webview.onDispose(() => {
+					// If the model is still dirty, make sure we have time to save it
+					if (modelRef.object.isDirty()) {
+						const sub = modelRef.object.onDidChangeDirty(() => {
+							if (!modelRef.object.isDirty()) {
+								sub.dispose();
+								modelRef.dispose();
+							}
+						});
+						return;
+					}
+
 					modelRef.dispose();
 				});
 
@@ -711,7 +722,7 @@ class MainThreadCustomEditorModel extends Disposable implements ICustomEditorMod
 	//#endregion
 
 	public isReadonly() {
-		return this._editable;
+		return !this._editable;
 	}
 
 	public get viewType() {
