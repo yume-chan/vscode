@@ -123,7 +123,7 @@ export async function spawn(options: SpawnOptions): Promise<Code> {
 	copyExtension(options, 'vscode-notebook-tests');
 
 	if (options.web) {
-		await launch(options.userDataDir, options.workspacePath, options.codePath);
+		await launch(options.userDataDir, options.workspacePath, options.codePath, options.extensionsPath);
 		connectDriver = connectPlaywrightDriver.bind(connectPlaywrightDriver, options.browser);
 		return connect(connectDriver, child, '', handle, options.logger);
 	}
@@ -186,8 +186,10 @@ export async function spawn(options: SpawnOptions): Promise<Code> {
 
 async function copyExtension(options: SpawnOptions, extId: string): Promise<void> {
 	const testResolverExtPath = path.join(options.extensionsPath, extId);
+	console.log(`copying ${extId} to ${testResolverExtPath}`);
 	if (!fs.existsSync(testResolverExtPath)) {
 		const orig = path.join(repoPath, 'extensions', extId);
+		console.log(`copying from ${repoPath}`);
 		await new Promise((c, e) => ncp(orig, testResolverExtPath, err => err ? e(err) : c()));
 	}
 }
