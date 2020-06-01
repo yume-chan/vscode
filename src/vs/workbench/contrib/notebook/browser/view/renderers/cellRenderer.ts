@@ -14,7 +14,7 @@ import { ProgressBar } from 'vs/base/browser/ui/progressbar/progressbar';
 import { ToolBar } from 'vs/base/browser/ui/toolbar/toolbar';
 import { ActionRunner, IAction } from 'vs/base/common/actions';
 import { Delayer } from 'vs/base/common/async';
-import { renderCodicons } from 'vs/base/common/codicons';
+import { renderCodicons, Codicon } from 'vs/base/common/codicons';
 import { Color } from 'vs/base/common/color';
 import { Emitter, Event } from 'vs/base/common/event';
 import { KeyCode } from 'vs/base/common/keyCodes';
@@ -374,6 +374,7 @@ export class MarkdownCellRenderer extends AbstractCellRenderer implements IListR
 
 		const innerContent = DOM.append(container, $('.cell.markdown'));
 		const foldingIndicator = DOM.append(focusIndicator, DOM.$('.notebook-folding-indicator'));
+		const grabber = DOM.append(focusIndicator, DOM.$(`.notebook-grabber ${Codicon.gripper.classNames}`));
 
 		const bottomCellContainer = DOM.append(container, $('.cell-bottom-toolbar-container'));
 
@@ -387,6 +388,7 @@ export class MarkdownCellRenderer extends AbstractCellRenderer implements IListR
 			editorContainer,
 			focusIndicator,
 			foldingIndicator,
+			grabber,
 			disposables,
 			elementDisposables: new DisposableStore(),
 			toolbar,
@@ -906,6 +908,7 @@ export class CodeCellRenderer extends AbstractCellRenderer implements IListRende
 		const contextKeyService = disposables.add(this.contextKeyServiceProvider(container));
 		const toolbar = disposables.add(this.createToolbar(container));
 		const focusIndicator = DOM.append(container, DOM.$('.notebook-cell-focus-indicator'));
+		const grabber = DOM.append(focusIndicator, DOM.$(`.notebook-grabber ${Codicon.gripper.classNames}`));
 		focusIndicator.setAttribute('draggable', 'true');
 
 		const cellContainer = DOM.append(container, $('.cell.code'));
@@ -954,6 +957,7 @@ export class CodeCellRenderer extends AbstractCellRenderer implements IListRende
 			languageStatusBarItem: statusBar.languageStatusBarItem,
 			progressBar,
 			focusIndicator,
+			grabber,
 			toolbar,
 			runToolbar,
 			runButtonContainer,

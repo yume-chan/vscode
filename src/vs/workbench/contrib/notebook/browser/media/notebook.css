@@ -388,6 +388,18 @@
 	opacity: 0.6;
 }
 
+.notebookOverlay .monaco-list .monaco-list-row .notebook-cell-focus-indicator .notebook-grabber {
+	position: absolute;
+	bottom: 0px;
+	left: 0;
+	right: 0;
+	margin: auto;
+	opacity: .3;
+	transform: rotate(90deg);
+}
+
+
+
 .notebookOverlay .monaco-list .monaco-list-row .notebook-cell-focus-indicator:hover {
 	cursor: grab;
 }
@@ -555,7 +567,7 @@
 
 /* makes all markdown cells consistent */
 .notebookOverlay .cell.markdown div {
-	min-height: 32px;
+	min-height: 44px;
 }
 
 .notebookOverlay .cell.markdown table {
