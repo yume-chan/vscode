@@ -15,6 +15,7 @@ jobs:
           ref: v19
       - name: Install Actions
         run: npm install --production --prefix ./actions
+      - name: Install Storage Module
         run: npm install @azure/storage-blob
       - name: Run Latest Release Monitor
         uses: ./actions/latest-release-monitor
