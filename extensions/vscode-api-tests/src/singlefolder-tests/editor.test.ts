@@ -47,7 +47,7 @@ suite('vscode API - editors', () => {
 		});
 	});
 
-	test('insert snippet with clipboard variables', async () => {
+	test.skip('insert snippet with clipboard variables', async () => {
 		const old = await env.clipboard.readText();
 		await env.clipboard.writeText('INTEGRATION-TESTS');
 
