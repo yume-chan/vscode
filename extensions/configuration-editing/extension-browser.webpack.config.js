@@ -9,20 +9,25 @@
 
 const withDefaults = require('../shared.webpack.config');
 const path = require('path');
-const webpack = require('webpack');
 
-const config = withDefaults({
-	context: path.join(__dirname, 'client'),
+const clientConfig = withDefaults({
+	target: 'webworker',
+	context: __dirname,
 	entry: {
-		extension: './src/node/jsonClientMain.ts'
+		extension: './src/configurationEditingMain.ts'
 	},
 	output: {
-		filename: 'jsonClientMain.js',
-		path: path.join(__dirname, 'client', 'dist', 'node')
+		filename: 'configurationEditingMain.js'
+	},
+	performance: {
+		hints: false
+	},
+	resolve: {
+		alias: {
+			'vscode-nls': path.resolve(__dirname, '../../build/polyfills/vscode-nls.js')
+		}
 	}
 });
+clientConfig.module.rules[0].use.shift(); // remove nls loader
 
-// add plugin, don't replace inherited
-config.plugins.push(new webpack.IgnorePlugin(/vertx/)); // request-light dependency
-
-module.exports = config;
+module.exports = clientConfig;
