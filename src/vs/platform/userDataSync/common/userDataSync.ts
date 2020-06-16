@@ -329,17 +329,11 @@ export interface IUserDataSynchroniser {
 
 // #region User Data Sync Services
 
-export const IUserDataSyncEnablementService = createDecorator<IUserDataSyncEnablementService>('IUserDataSyncEnablementService');
-export interface IUserDataSyncEnablementService {
+export const IUserDataSyncResourceEnablementService = createDecorator<IUserDataSyncResourceEnablementService>('IUserDataSyncResourceEnablementService');
+export interface IUserDataSyncResourceEnablementService {
 	_serviceBrand: any;
 
-	readonly onDidChangeEnablement: Event<boolean>;
 	readonly onDidChangeResourceEnablement: Event<[SyncResource, boolean]>;
-
-	isEnabled(): boolean;
-	setEnablement(enabled: boolean): void;
-	canToggleEnablement(): boolean;
-
 	isResourceEnabled(resource: SyncResource): boolean;
 	setResourceEnablement(resource: SyncResource, enabled: boolean): void;
 }
@@ -383,6 +377,9 @@ export const IUserDataAutoSyncService = createDecorator<IUserDataAutoSyncService
 export interface IUserDataAutoSyncService {
 	_serviceBrand: any;
 	readonly onError: Event<UserDataSyncError>;
+	readonly onDidChangeEnablement: Event<boolean>;
+	isEnabled(): boolean;
+	canToggleEnablement(): boolean;
 	turnOn(pullFirst: boolean): Promise<void>;
 	turnOff(): Promise<void>;
 	triggerSync(sources: string[], hasToLimitSync: boolean): Promise<void>;
