@@ -15,9 +15,9 @@ set CODE=".build\electron\%NAMESHORT%"
 node build\lib\electron.js
 if %errorlevel% neq 0 node .\node_modules\gulp\bin\gulp.js electron
 
-:: Run tests
-set ELECTRON_ENABLE_LOGGING=1
-%CODE% .\test\unit\electron\index.js %*
+REM :: Run tests
+REM set ELECTRON_ENABLE_LOGGING=1
+REM %CODE% .\test\unit\electron\index.js %*
 
 popd
 

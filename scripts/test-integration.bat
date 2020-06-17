@@ -37,39 +37,39 @@ if "%INTEGRATION_TEST_ELECTRON_PATH%"=="" (
 	echo Running integration tests with '%INTEGRATION_TEST_ELECTRON_PATH%' as build.
 )
 
-:: Integration & performance tests in AMD
-call .\scripts\test.bat --runGlob **\*.integrationTest.js %*
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM :: Integration & performance tests in AMD
+REM call .\scripts\test.bat --runGlob **\*.integrationTest.js %*
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
-:: Tests in the extension host
+REM :: Tests in the extension host
 
-call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-notebook-tests\test --enable-proposed-api=vscode.vscode-notebook-tests --extensionDevelopmentPath=%~dp0\..\extensions\vscode-notebook-tests --extensionTestsPath=%~dp0\..\extensions\vscode-notebook-tests\out --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-notebook-tests\test --enable-proposed-api=vscode.vscode-notebook-tests --extensionDevelopmentPath=%~dp0\..\extensions\vscode-notebook-tests --extensionTestsPath=%~dp0\..\extensions\vscode-notebook-tests\out --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
 call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-api-tests\testWorkspace --enable-proposed-api=vscode.vscode-api-tests --extensionDevelopmentPath=%~dp0\..\extensions\vscode-api-tests --extensionTestsPath=%~dp0\..\extensions\vscode-api-tests\out\singlefolder-tests --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-api-tests\testworkspace.code-workspace --enable-proposed-api=vscode.vscode-api-tests --extensionDevelopmentPath=%~dp0\..\extensions\vscode-api-tests --extensionTestsPath=%~dp0\..\extensions\vscode-api-tests\out\workspace-tests --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-api-tests\testworkspace.code-workspace --enable-proposed-api=vscode.vscode-api-tests --extensionDevelopmentPath=%~dp0\..\extensions\vscode-api-tests --extensionTestsPath=%~dp0\..\extensions\vscode-api-tests\out\workspace-tests --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
-call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-colorize-tests\test --extensionDevelopmentPath=%~dp0\..\extensions\vscode-colorize-tests --extensionTestsPath=%~dp0\..\extensions\vscode-colorize-tests\out --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM call "%INTEGRATION_TEST_ELECTRON_PATH%" %~dp0\..\extensions\vscode-colorize-tests\test --extensionDevelopmentPath=%~dp0\..\extensions\vscode-colorize-tests --extensionTestsPath=%~dp0\..\extensions\vscode-colorize-tests\out --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
-call "%INTEGRATION_TEST_ELECTRON_PATH%" $%~dp0\..\extensions\markdown-language-features\out\test\test-fixtures --extensionDevelopmentPath=%~dp0\..\extensions\markdown-language-features --extensionTestsPath=%~dp0\..\extensions\markdown-language-features\out\test --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR% .
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM call "%INTEGRATION_TEST_ELECTRON_PATH%" $%~dp0\..\extensions\markdown-language-features\out\test\test-fixtures --extensionDevelopmentPath=%~dp0\..\extensions\markdown-language-features --extensionTestsPath=%~dp0\..\extensions\markdown-language-features\out\test --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR% .
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
-call "%INTEGRATION_TEST_ELECTRON_PATH%" $%~dp0\..\extensions\emmet\out\test\test-fixtures --extensionDevelopmentPath=%~dp0\..\extensions\emmet --extensionTestsPath=%~dp0\..\extensions\emmet\out\test --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR% .
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM call "%INTEGRATION_TEST_ELECTRON_PATH%" $%~dp0\..\extensions\emmet\out\test\test-fixtures --extensionDevelopmentPath=%~dp0\..\extensions\emmet --extensionTestsPath=%~dp0\..\extensions\emmet\out\test --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR% .
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
-for /f "delims=" %%i in ('node -p "require('fs').realpathSync.native(require('os').tmpdir())"') do set TEMPDIR=%%i
-set GITWORKSPACE=%TEMPDIR%\git-%RANDOM%
-mkdir %GITWORKSPACE%
-call "%INTEGRATION_TEST_ELECTRON_PATH%" %GITWORKSPACE% --extensionDevelopmentPath=%~dp0\..\extensions\git --extensionTestsPath=%~dp0\..\extensions\git\out\test --enable-proposed-api=vscode.git --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM for /f "delims=" %%i in ('node -p "require('fs').realpathSync.native(require('os').tmpdir())"') do set TEMPDIR=%%i
+REM set GITWORKSPACE=%TEMPDIR%\git-%RANDOM%
+REM mkdir %GITWORKSPACE%
+REM call "%INTEGRATION_TEST_ELECTRON_PATH%" %GITWORKSPACE% --extensionDevelopmentPath=%~dp0\..\extensions\git --extensionTestsPath=%~dp0\..\extensions\git\out\test --enable-proposed-api=vscode.git --disable-telemetry --crash-reporter-directory=%VSCODECRASHDIR% --no-cached-data --disable-updates --disable-extensions --user-data-dir=%VSCODEUSERDATADIR%
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
-:: Tests in commonJS (HTML, CSS, JSON language server tests...)
-call .\scripts\node-electron.bat .\node_modules\mocha\bin\_mocha .\extensions\*\server\out\test\**\*.test.js
-if %errorlevel% neq 0 exit /b %errorlevel%
+REM :: Tests in commonJS (HTML, CSS, JSON language server tests...)
+REM call .\scripts\node-electron.bat .\node_modules\mocha\bin\_mocha .\extensions\*\server\out\test\**\*.test.js
+REM if %errorlevel% neq 0 exit /b %errorlevel%
 
 rmdir /s /q %VSCODEUSERDATADIR%
 
