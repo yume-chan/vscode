@@ -340,7 +340,7 @@ export class KeybindingResolver {
 						// When in chord search mode, we ignore any keybindings that are not chord
 					} else if (candidate.keypressParts.length > 1 && candidate.keypressParts[1] !== null) {
 						candidateChords.push(candidate);
-						maxChordTimeout = Math.min(maxChordTimeout, candidate.timeout);
+						maxChordTimeout = Math.max(maxChordTimeout, candidate.timeout);
 					}
 				}
 			}
