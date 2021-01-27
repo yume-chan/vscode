@@ -6,11 +6,18 @@
 import { IContext, ContextKeyExpression, ContextKeyExprType } from 'vs/platform/contextkey/common/contextkey';
 import { ResolvedKeybindingItem } from 'vs/platform/keybinding/common/resolvedKeybindingItem';
 
+export interface ICurrentChord {
+	keypress: string;
+	label: string | null;
+	enterTime: number;
+}
+
 export interface IResolveResult {
 	/** Whether the resolved keybinding is entering a chord */
 	enterChord: boolean;
 	/** Whether the resolved keybinding is leaving (and executing) a chord */
 	leaveChord: boolean;
+	maxTimeout: number;
 	commandId: string | null;
 	commandArgs: any;
 	bubble: boolean;
@@ -256,28 +263,44 @@ export class KeybindingResolver {
 		return items[items.length - 1];
 	}
 
-	public resolve(context: IContext, currentChord: string | null, keypress: string): IResolveResult | null {
+	public resolve(context: IContext, currentChord: ICurrentChord | null, keypress: string): IResolveResult | null {
 		this._log(`| Resolving ${keypress}${currentChord ? ` chorded from ${currentChord}` : ``}`);
-		let lookupMap: ResolvedKeybindingItem[] | null = null;
 
 		if (currentChord !== null) {
 			// Fetch all chord bindings for `currentChord`
 
-			const candidates = this._map.get(currentChord);
+			const candidates = this._map.get(currentChord.keypress);
 			if (typeof candidates === 'undefined') {
 				// No chords starting with `currentChord`
 				this._log(`\\ No keybinding entries.`);
 				return null;
 			}
 
-			lookupMap = [];
-			for (let i = 0, len = candidates.length; i < len; i++) {
-				let candidate = candidates[i];
+			const timeElapsed = Date.now() - currentChord.enterTime;
+
+			// Later keybidning definitions has higher priority
+			for (let i = candidates.length - 1; i >= 0; i--) {
+				const candidate = candidates[i];
+				// TODO: figure out what next TODO want to do
 				// TODO@chords
-				if (candidate.keypressParts[1] === keypress) {
-					lookupMap.push(candidate);
+				if (candidate.keypressParts[1] === keypress && // Key matches
+					KeybindingResolver.contextMatchesRules(context, candidate.when) && // When clause matches
+					timeElapsed <= candidate.timeout) { // Timeout matches
+					// The chosen one
+					this._log(`\\ From ${candidates.length} keybinding entries, matched ${candidate.command}, when: ${printWhenExplanation(candidate.when)}, source: ${printSourceExplanation(candidate)}.`);
+					return {
+						enterChord: false,
+						leaveChord: true,
+						maxTimeout: 0,
+						commandId: candidate.command,
+						commandArgs: candidate.commandArgs,
+						bubble: candidate.bubble
+					};
 				}
 			}
+
+			this._log(`\\ From ${candidates.length} keybinding entries, no when clauses matched the context.`);
+			return null;
 		} else {
 			const candidates = this._map.get(keypress);
 			if (typeof candidates === 'undefined') {
@@ -286,49 +309,58 @@ export class KeybindingResolver {
 				return null;
 			}
 
-			lookupMap = candidates;
-		}
+			// Maybe we will have multiple possible chords, with different
+			let candidateChords: ResolvedKeybindingItem[] | undefined;
+			let maxChordTimeout = Infinity;
 
-		let result = this._findCommand(context, lookupMap);
-		if (!result) {
-			this._log(`\\ From ${lookupMap.length} keybinding entries, no when clauses matched the context.`);
-			return null;
-		}
+			for (let i = candidates.length - 1; i >= 0; i--) {
+				const candidate = candidates[i];
+				// TODO: figure out what next TODO want to do
+				// TODO@chords
+				if (KeybindingResolver.contextMatchesRules(context, candidate.when)) {
+					// If the first one (last one in definition order) is not a chord
+					// We choose this one
+					if (candidateChords === undefined) {
+						if (candidate.keypressParts.length === 1) {
+							this._log(`\\ From ${candidates.length} keybinding entries, matched ${candidate.command}, when: ${printWhenExplanation(candidate.when)}, source: ${printSourceExplanation(candidate)}.`);
+							return {
+								enterChord: false,
+								leaveChord: false,
+								maxTimeout: 0,
+								commandId: candidate.command,
+								commandArgs: candidate.commandArgs,
+								bubble: candidate.bubble
+							};
+						} else {
+							// If the first one does be a chord
+							// We enter chord search mode
+							candidateChords = [candidate];
+							maxChordTimeout = candidate.timeout;
+						}
+						// When in chord search mode, we ignore any keybindings that are not chord
+					} else if (candidate.keypressParts.length > 1 && candidate.keypressParts[1] !== null) {
+						candidateChords.push(candidate);
+						maxChordTimeout = Math.min(maxChordTimeout, candidate.timeout);
+					}
+				}
+			}
 
-		// TODO@chords
-		if (currentChord === null && result.keypressParts.length > 1 && result.keypressParts[1] !== null) {
-			this._log(`\\ From ${lookupMap.length} keybinding entries, matched chord, when: ${printWhenExplanation(result.when)}, source: ${printSourceExplanation(result)}.`);
+			if (candidateChords === undefined) {
+				this._log(`\\ From ${candidates.length} keybinding entries, no when clauses matched the context.`);
+				return null;
+			}
+
+			this._log(`\\ From ${candidates.length} keybinding entries, matched ${candidateChords.length} chord.`);
 			return {
 				enterChord: true,
 				leaveChord: false,
+				maxTimeout: maxChordTimeout,
 				commandId: null,
 				commandArgs: null,
 				bubble: false
 			};
 		}
 
-		this._log(`\\ From ${lookupMap.length} keybinding entries, matched ${result.command}, when: ${printWhenExplanation(result.when)}, source: ${printSourceExplanation(result)}.`);
-		return {
-			enterChord: false,
-			leaveChord: result.keypressParts.length > 1,
-			commandId: result.command,
-			commandArgs: result.commandArgs,
-			bubble: result.bubble
-		};
-	}
-
-	private _findCommand(context: IContext, matches: ResolvedKeybindingItem[]): ResolvedKeybindingItem | null {
-		for (let i = matches.length - 1; i >= 0; i--) {
-			let k = matches[i];
-
-			if (!KeybindingResolver.contextMatchesRules(context, k.when)) {
-				continue;
-			}
-
-			return k;
-		}
-
-		return null;
 	}
 
 	public static contextMatchesRules(context: IContext, rules: ContextKeyExpression | null | undefined): boolean {

@@ -12,17 +12,12 @@ import { Disposable, IDisposable } from 'vs/base/common/lifecycle';
 import { ICommandService } from 'vs/platform/commands/common/commands';
 import { IContextKeyService, IContextKeyServiceTarget } from 'vs/platform/contextkey/common/contextkey';
 import { IKeybindingEvent, IKeybindingService, IKeyboardEvent, KeybindingsSchemaContribution } from 'vs/platform/keybinding/common/keybinding';
-import { IResolveResult, KeybindingResolver } from 'vs/platform/keybinding/common/keybindingResolver';
+import { IResolveResult, KeybindingResolver, ICurrentChord } from 'vs/platform/keybinding/common/keybindingResolver';
 import { ResolvedKeybindingItem } from 'vs/platform/keybinding/common/resolvedKeybindingItem';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification } from 'vs/base/common/actions';
 import { ILogService } from 'vs/platform/log/common/log';
-
-interface CurrentChord {
-	keypress: string;
-	label: string | null;
-}
 
 export abstract class AbstractKeybindingService extends Disposable implements IKeybindingService {
 	public _serviceBrand: undefined;
@@ -32,7 +27,7 @@ export abstract class AbstractKeybindingService extends Disposable implements IK
 		return this._onDidUpdateKeybindings ? this._onDidUpdateKeybindings.event : Event.None; // Sinon stubbing walks properties on prototype
 	}
 
-	private _currentChord: CurrentChord | null;
+	private _currentChord: ICurrentChord | null;
 	private _currentChordChecker: IntervalTimer;
 	private _currentChordStatusMessage: IDisposable | null;
 	protected _logging: boolean;
@@ -127,17 +122,17 @@ export abstract class AbstractKeybindingService extends Disposable implements IK
 		}
 
 		const contextValue = this._contextKeyService.getContext(target);
-		const currentChord = this._currentChord ? this._currentChord.keypress : null;
-		return this._getResolver().resolve(contextValue, currentChord, firstPart);
+		return this._getResolver().resolve(contextValue, this._currentChord, firstPart);
 	}
 
-	private _enterChordMode(firstPart: string, keypressLabel: string | null): void {
+	private _enterChordMode(firstPart: string, keypressLabel: string | null, maxTimeout: number): void {
+		const chordEnterTime = Date.now();
 		this._currentChord = {
 			keypress: firstPart,
-			label: keypressLabel
+			label: keypressLabel,
+			enterTime: chordEnterTime,
 		};
 		this._currentChordStatusMessage = this._notificationService.status(nls.localize('first.chord', "({0}) was pressed. Waiting for second key of chord...", keypressLabel));
-		const chordEnterTime = Date.now();
 		this._currentChordChecker.cancelAndSet(() => {
 
 			if (!this._documentHasFocus()) {
@@ -146,8 +141,8 @@ export abstract class AbstractKeybindingService extends Disposable implements IK
 				return;
 			}
 
-			if (Date.now() - chordEnterTime > 5000) {
-				// 5 seconds elapsed => leave chord mode
+			if (Date.now() - chordEnterTime > maxTimeout) {
+				// max timeout for all candidate chords elapsed => leave chord mode
 				this._leaveChordMode();
 			}
 
@@ -189,15 +184,14 @@ export abstract class AbstractKeybindingService extends Disposable implements IK
 		}
 
 		const contextValue = this._contextKeyService.getContext(target);
-		const currentChord = this._currentChord ? this._currentChord.keypress : null;
 		const keypressLabel = keybinding.getLabel();
-		const resolveResult = this._getResolver().resolve(contextValue, currentChord, firstPart);
+		const resolveResult = this._getResolver().resolve(contextValue, this._currentChord, firstPart);
 
 		this._logService.trace('KeybindingService#dispatch', keypressLabel, resolveResult?.commandId);
 
 		if (resolveResult && resolveResult.enterChord) {
 			shouldPreventDefault = true;
-			this._enterChordMode(firstPart, keypressLabel);
+			this._enterChordMode(firstPart, keypressLabel, resolveResult.maxTimeout);
 			return shouldPreventDefault;
 		}
 
