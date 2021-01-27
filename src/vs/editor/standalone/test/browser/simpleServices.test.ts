@@ -40,7 +40,7 @@ suite('StandaloneKeybindingService', () => {
 		let commandInvoked = false;
 		keybindingService.addDynamicKeybinding('testCommand', KeyCode.F9, () => {
 			commandInvoked = true;
-		}, undefined);
+		}, undefined, undefined);
 
 		keybindingService.testDispatch({
 			_standardKeyboardEventBrand: true,

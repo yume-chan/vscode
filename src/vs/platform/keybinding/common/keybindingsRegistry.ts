@@ -14,6 +14,7 @@ export interface IKeybindingItem {
 	command: string;
 	commandArgs?: any;
 	when: ContextKeyExpression | null | undefined;
+	timeout: number | undefined;
 	weight1: number;
 	weight2: number;
 	extensionId: string | null;
@@ -42,6 +43,7 @@ export interface IKeybindingRule extends IKeybindings {
 	weight: number;
 	args?: any;
 	when?: ContextKeyExpression | null | undefined;
+	timeout?: number | undefined;
 }
 
 export interface IKeybindingRule2 {
@@ -53,6 +55,7 @@ export interface IKeybindingRule2 {
 	args?: any;
 	weight: number;
 	when: ContextKeyExpression | undefined;
+	timeout: number | undefined;
 	extensionId?: string;
 	isBuiltinExtension?: boolean;
 }
@@ -137,7 +140,7 @@ class KeybindingsRegistryImpl implements IKeybindingsRegistry {
 		if (actualKb && actualKb.primary) {
 			const kk = createKeybinding(actualKb.primary, OS);
 			if (kk) {
-				this._registerDefaultKeybinding(kk, rule.id, rule.args, rule.weight, 0, rule.when);
+				this._registerDefaultKeybinding(kk, rule.id, rule.args, rule.weight, 0, rule.when, rule.timeout);
 			}
 		}
 
@@ -146,7 +149,7 @@ class KeybindingsRegistryImpl implements IKeybindingsRegistry {
 				const k = actualKb.secondary[i];
 				const kk = createKeybinding(k, OS);
 				if (kk) {
-					this._registerDefaultKeybinding(kk, rule.id, rule.args, rule.weight, -i - 1, rule.when);
+					this._registerDefaultKeybinding(kk, rule.id, rule.args, rule.weight, -i - 1, rule.when, rule.timeout);
 				}
 			}
 		}
@@ -164,6 +167,7 @@ class KeybindingsRegistryImpl implements IKeybindingsRegistry {
 					command: rule.id,
 					commandArgs: rule.args,
 					when: rule.when,
+					timeout: rule.timeout,
 					weight1: rule.weight,
 					weight2: 0,
 					extensionId: rule.extensionId || null,
@@ -215,7 +219,7 @@ class KeybindingsRegistryImpl implements IKeybindingsRegistry {
 		}
 	}
 
-	private _registerDefaultKeybinding(keybinding: Keybinding, commandId: string, commandArgs: any, weight1: number, weight2: number, when: ContextKeyExpression | null | undefined): void {
+	private _registerDefaultKeybinding(keybinding: Keybinding, commandId: string, commandArgs: any, weight1: number, weight2: number, when: ContextKeyExpression | null | undefined, timeout: number | undefined): void {
 		if (OS === OperatingSystem.Windows) {
 			this._assertNoCtrlAlt(keybinding.parts[0], commandId);
 		}
@@ -224,6 +228,7 @@ class KeybindingsRegistryImpl implements IKeybindingsRegistry {
 			command: commandId,
 			commandArgs: commandArgs,
 			when: when,
+			timeout: timeout,
 			weight1: weight1,
 			weight2: weight2,
 			extensionId: null,

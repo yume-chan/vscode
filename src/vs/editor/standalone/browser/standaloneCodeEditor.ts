@@ -259,7 +259,7 @@ export class StandaloneCodeEditor extends CodeEditorWidget implements IStandalon
 		}
 		let commandId = 'DYNAMIC_' + (++LAST_GENERATED_COMMAND_ID);
 		let whenExpression = ContextKeyExpr.deserialize(context);
-		this._standaloneKeybindingService.addDynamicKeybinding(commandId, keybinding, handler, whenExpression);
+		this._standaloneKeybindingService.addDynamicKeybinding(commandId, keybinding, handler, whenExpression, undefined);
 		return commandId;
 	}
 
@@ -320,7 +320,7 @@ export class StandaloneCodeEditor extends CodeEditorWidget implements IStandalon
 		// Register the keybindings
 		if (Array.isArray(keybindings)) {
 			for (const kb of keybindings) {
-				toDispose.add(this._standaloneKeybindingService.addDynamicKeybinding(uniqueId, kb, run, keybindingsWhen));
+				toDispose.add(this._standaloneKeybindingService.addDynamicKeybinding(uniqueId, kb, run, keybindingsWhen, undefined));
 			}
 		}
 

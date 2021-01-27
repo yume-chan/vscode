@@ -15,6 +15,7 @@ export interface IUserKeybindingItem {
 	command: string | null;
 	commandArgs?: any;
 	when: ContextKeyExpression | undefined;
+	timeout: number | undefined;
 }
 
 export class KeybindingIO {
@@ -48,11 +49,13 @@ export class KeybindingIO {
 		const when = (typeof input.when === 'string' ? ContextKeyExpr.deserialize(input.when) : undefined);
 		const command = (typeof input.command === 'string' ? input.command : null);
 		const commandArgs = (typeof input.args !== 'undefined' ? input.args : undefined);
+		const timeout = (typeof input.timeout === 'number' ? input.timeout : undefined);
 		return {
 			parts: parts,
 			command: command,
 			commandArgs: commandArgs,
-			when: when
+			when: when,
+			timeout: timeout,
 		};
 	}
 }

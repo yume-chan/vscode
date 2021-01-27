@@ -16,6 +16,7 @@ export interface IUserFriendlyKeybinding {
 	command: string;
 	args?: any;
 	when?: string;
+	timeout?: number;
 }
 
 export const enum KeybindingSource {
@@ -108,4 +109,3 @@ export interface IKeybindingService {
 	_dumpDebugInfo(): string;
 	_dumpDebugInfoJSON(): string;
 }
-

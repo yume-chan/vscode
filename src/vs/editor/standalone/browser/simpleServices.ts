@@ -320,7 +320,7 @@ export class StandaloneKeybindingService extends AbstractKeybindingService {
 		}));
 	}
 
-	public addDynamicKeybinding(commandId: string, _keybinding: number, handler: ICommandHandler, when: ContextKeyExpression | undefined): IDisposable {
+	public addDynamicKeybinding(commandId: string, _keybinding: number, handler: ICommandHandler, when: ContextKeyExpression | undefined, timeout: number | undefined): IDisposable {
 		const keybinding = createKeybinding(_keybinding, OS);
 
 		const toDispose = new DisposableStore();
@@ -330,6 +330,7 @@ export class StandaloneKeybindingService extends AbstractKeybindingService {
 				keybinding: keybinding,
 				command: commandId,
 				when: when,
+				timeout: timeout,
 				weight1: 1000,
 				weight2: 0,
 				extensionId: null,
@@ -377,15 +378,16 @@ export class StandaloneKeybindingService extends AbstractKeybindingService {
 		let result: ResolvedKeybindingItem[] = [], resultLen = 0;
 		for (const item of items) {
 			const when = item.when || undefined;
+			const timeout = item.timeout || undefined;
 			const keybinding = item.keybinding;
 
 			if (!keybinding) {
 				// This might be a removal keybinding item in user settings => accept it
-				result[resultLen++] = new ResolvedKeybindingItem(undefined, item.command, item.commandArgs, when, isDefault, null, false);
+				result[resultLen++] = new ResolvedKeybindingItem(undefined, item.command, item.commandArgs, when, timeout, isDefault, null, false);
 			} else {
 				const resolvedKeybindings = this.resolveKeybinding(keybinding);
 				for (const resolvedKeybinding of resolvedKeybindings) {
-					result[resultLen++] = new ResolvedKeybindingItem(resolvedKeybinding, item.command, item.commandArgs, when, isDefault, null, false);
+					result[resultLen++] = new ResolvedKeybindingItem(resolvedKeybinding, item.command, item.commandArgs, when, timeout, isDefault, null, false);
 				}
 			}
 		}
@@ -725,7 +727,7 @@ export class SimpleUriLabelService implements ILabelService {
 
 	public readonly onDidChangeFormatters: Event<IFormatterChangeEvent> = Event.None;
 
-	public getUriLabel(resource: URI, options?: { relative?: boolean, forceNoTildify?: boolean }): string {
+	public getUriLabel(resource: URI, options?: { relative?: boolean, forceNoTildify?: boolean; }): string {
 		if (resource.scheme === 'file') {
 			return resource.fsPath;
 		}

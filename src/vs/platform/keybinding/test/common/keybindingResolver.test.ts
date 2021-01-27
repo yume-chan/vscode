@@ -6,7 +6,7 @@ import * as assert from 'assert';
 import { KeyChord, KeyCode, KeyMod, SimpleKeybinding, createKeybinding, createSimpleKeybinding } from 'vs/base/common/keyCodes';
 import { OS } from 'vs/base/common/platform';
 import { ContextKeyExpr, IContext, ContextKeyExpression } from 'vs/platform/contextkey/common/contextkey';
-import { KeybindingResolver } from 'vs/platform/keybinding/common/keybindingResolver';
+import { KeybindingResolver, ICurrentChord } from 'vs/platform/keybinding/common/keybindingResolver';
 import { ResolvedKeybindingItem } from 'vs/platform/keybinding/common/resolvedKeybindingItem';
 import { USLayoutResolvedKeybinding } from 'vs/platform/keybinding/common/usLayoutResolvedKeybinding';
 
@@ -20,13 +20,14 @@ function createContext(ctx: any) {
 
 suite('KeybindingResolver', () => {
 
-	function kbItem(keybinding: number, command: string, commandArgs: any, when: ContextKeyExpression | undefined, isDefault: boolean): ResolvedKeybindingItem {
+	function kbItem(keybinding: number, command: string, commandArgs: any, when: ContextKeyExpression | undefined, isDefault: boolean, timeout?: number): ResolvedKeybindingItem {
 		const resolvedKeybinding = (keybinding !== 0 ? new USLayoutResolvedKeybinding(createKeybinding(keybinding, OS)!, OS) : undefined);
 		return new ResolvedKeybindingItem(
 			resolvedKeybinding,
 			command,
 			commandArgs,
 			when,
+			timeout,
 			isDefault,
 			null,
 			false
@@ -325,7 +326,7 @@ suite('KeybindingResolver', () => {
 		let testResolve = (ctx: IContext, _expectedKey: number, commandId: string) => {
 			const expectedKey = createKeybinding(_expectedKey, OS)!;
 
-			let previousPart: (string | null) = null;
+			let previousPart: (ICurrentChord | null) = null;
 			for (let i = 0, len = expectedKey.parts.length; i < len; i++) {
 				let part = getDispatchStr(expectedKey.parts[i]);
 				let result = resolver.resolve(ctx, previousPart, part);
@@ -342,7 +343,7 @@ suite('KeybindingResolver', () => {
 					assert.strictEqual(result!.commandId, null, `Enters chord for ${commandId} at part ${i}`);
 					assert.strictEqual(result!.enterChord, true, `Enters chord for ${commandId} at part ${i}`);
 				}
-				previousPart = part;
+				previousPart = { keypress: part, label: null, enterTime: 0 };
 			}
 		};
 
