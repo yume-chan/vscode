@@ -343,7 +343,7 @@ suite('KeybindingResolver', () => {
 					assert.strictEqual(result!.commandId, null, `Enters chord for ${commandId} at part ${i}`);
 					assert.strictEqual(result!.enterChord, true, `Enters chord for ${commandId} at part ${i}`);
 				}
-				previousPart = { keypress: part, label: null, enterTime: 0 };
+				previousPart = { keypress: part, label: null, enterTime: Date.now() };
 			}
 		};
 
